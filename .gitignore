@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+build/
+
+# Node / Playwright
+node_modules/
+test-results/
+playwright-report/
+
+# Generated output (www/ is the committed showcase build)
+dist/
+.*.staging-*/
+.*.old-*/
+tests/fixtures/*.mp4
+tests/artifacts/
+
+# Source media is never published; drop your own clips in here
+assets/video/
+
+# OS
+.DS_Store

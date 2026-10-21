@@ -1,0 +1,11 @@
+# Fully pinned environment used to build and test this repository.
+# Install with: pip install -r requirements.lock && pip install -e . --no-deps
+numpy==2.5.4
+pillow==13.0.0
+pytest==9.1.1
+iniconfig==2.3.1
+packaging==26.3
+pluggy==1.7.0
+Pygments==2.21.0
+fonttools==4.67.0
+brotli==1.2.0

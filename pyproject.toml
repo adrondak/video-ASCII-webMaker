@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ascii-film"
+version = "1.0.0"
+description = "Local video-to-typographic-animation encoder and static Canvas player"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+dependencies = [
+  "numpy>=2.0,<3",
+  "Pillow>=10.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+  "fonttools>=4.50",
+  "brotli>=1.1",
+]
+
+[project.scripts]
+ascii-film = "encoder.cli:main"
+
+[tool.setuptools]
+packages = ["encoder"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
