@@ -105,7 +105,7 @@ body.failed #controls { display: none; }
 #controls button:hover { background: rgba(255, 255, 255, 0.12); }
 #controls button[hidden], #controls input[hidden] { display: none; }
 #controls svg { width: 22px; height: 22px; fill: currentColor; }
-#controls button[aria-pressed="false"] { opacity: 0.45; }
+#loop[aria-pressed="false"] { opacity: 0.45; }
 
 #play[data-state="playing"] .i-play,
 #play[data-state="paused"] .i-pause,
@@ -148,3 +148,42 @@ button:focus-visible, input:focus-visible {
 }
 
 .noscript { position: fixed; inset: auto 0 45% 0; text-align: center; }
+
+/* ---- live webcam page ---- */
+#start-panel {
+  position: absolute;
+  max-width: min(30em, calc(100vw - 32px));
+  padding: 1.6em 1.8em;
+  border-radius: 12px;
+  background: var(--ui-bg);
+  text-align: center;
+}
+#start-panel[hidden] { display: none; }
+#start-panel h1 { margin: 0 0 0.4em; font-size: 1.5em; font-weight: 650; letter-spacing: 0.02em; }
+#start-panel p { margin: 0.6em 0; opacity: 0.85; }
+#start-panel .fine { font-size: 0.85em; opacity: 0.6; }
+#start {
+  margin: 0.8em 0 0.4em;
+  padding: 0.7em 1.6em;
+  border: 0;
+  border-radius: 999px;
+  background: var(--film-fg);
+  color: var(--film-bg);
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+#start:disabled { opacity: 0.5; cursor: progress; }
+#start:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+body.live #status:not(:empty) { bottom: 18%; }
+#density, #rate {
+  flex: none;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+  min-width: 4.8em;
+  text-align: center;
+}
+#rate { margin-left: auto; opacity: 0.55; }
+#controls button[aria-pressed="true"] { background: rgba(255, 255, 255, 0.14); }
+body.live #controls button[aria-pressed="false"] { opacity: 1; }

@@ -12,9 +12,26 @@ export default defineConfig({
   outputDir: "tests/artifacts/playwright",
   use: { baseURL: `http://127.0.0.1:${PORT}/`, viewport: { width: 1280, height: 720 } },
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 720 } } },
-    { name: "firefox", use: { ...devices["Desktop Firefox"], viewport: { width: 1280, height: 720 } } },
-    { name: "webkit", use: { ...devices["Desktop Safari"], viewport: { width: 1280, height: 720 } } },
+    { name: "chromium", testMatch: "player.spec.mjs", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 720 } } },
+    { name: "firefox", testMatch: "player.spec.mjs", use: { ...devices["Desktop Firefox"], viewport: { width: 1280, height: 720 } } },
+    { name: "webkit", testMatch: "player.spec.mjs", use: { ...devices["Desktop Safari"], viewport: { width: 1280, height: 720 } } },
+    // The live webcam page, fed by each browser's built-in fake camera.
+    {
+      name: "live-chromium",
+      testMatch: "live.spec.mjs",
+      use: {
+        ...devices["Desktop Chrome"], viewport: { width: 1280, height: 720 },
+        launchOptions: { args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"] },
+      },
+    },
+    {
+      name: "live-firefox",
+      testMatch: "live.spec.mjs",
+      use: {
+        ...devices["Desktop Firefox"], viewport: { width: 1280, height: 720 },
+        launchOptions: { firefoxUserPrefs: { "media.navigator.streams.fake": true, "media.navigator.permission.disabled": true } },
+      },
+    },
   ],
   webServer: {
     command: `scripts/e2e-prepare.sh ${PORT}`,

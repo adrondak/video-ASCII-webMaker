@@ -1,0 +1,20 @@
+{
+  "_comment": "Settings used to build www-live/ (the webcam page) with: ascii-film live --config examples/live-config.json -o www-live --force",
+  "columns": 140,
+  "font": "../assets/fonts/DejaVuSansMono-Bold.ttf",
+  "line_height": 1.0,
+  "glyphs": " .'`^\",:;Il!i><~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$",
+  "gamma": 0.8,
+  "contrast": 1.1,
+  "variation": 1.0,
+  "stability": 0.35,
+  "foreground": "#e9f3f4",
+  "background": "#05090c",
+  "title": "ASCII Mirror",
+  "description": "Your camera, drawn live in moving text characters. Nothing leaves this browser tab.",
+  "lens": true,
+  "lens_radius": 7,
+  "lens_strength": 1.4,
+  "ripples": true,
+  "ripple_strength": 1.0
+}

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>ASCII Mirror</title>
+<link rel="stylesheet" href="player.css">
+</head>
+<body class="paused live">
+<main id="stage">
+  <canvas id="film" role="img" aria-label="Your camera, drawn live in text characters"></canvas>
+  <p id="status" role="status" aria-live="polite">Loading…</p>
+  <section id="start-panel" hidden>
+    <h1 id="live-title">ASCII Mirror</h1>
+    <p>See yourself drawn live in text characters. Move the cursor over the
+      letters to push them around.</p>
+    <button id="start" type="button">Start camera</button>
+    <p class="fine">Everything happens in this browser tab. No video is recorded,
+      stored or sent anywhere.</p>
+  </section>
+  <video id="camera" playsinline muted hidden></video>
+</main>
+
+<div id="controls" role="toolbar" aria-label="Live controls">
+  <button id="freeze" type="button" aria-label="Freeze" aria-pressed="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
+  </button>
+  <button id="mirror" type="button" aria-label="Mirror" aria-pressed="true">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 3h2v18h-2zM3 7l6 5-6 5zm18 0v10l-6-5z"/></svg>
+  </button>
+  <button id="fewer" type="button" aria-label="Bigger letters (fewer columns)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11h14v2H5z"/></svg>
+  </button>
+  <span id="density" aria-live="polite">160 cols</span>
+  <button id="more" type="button" aria-label="Smaller letters (more columns)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
+  </button>
+  <span id="rate" aria-hidden="true"></span>
+  <button id="theme" type="button" aria-label="Colour theme">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18V3z"/><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+  </button>
+  <button id="fullscreen" type="button" aria-label="Full screen">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+  </button>
+</div>
+
+<noscript><p class="noscript">This page draws with JavaScript. Please enable it.</p></noscript>
+<script type="module" src="live.js"></script>
+</body>
+</html>

@@ -10,6 +10,7 @@ from . import __version__
 from .config import build_config
 from .container import AscfFile
 from .engine import FrameEngine
+from .live import build_live
 from .pipeline import encode
 from .errors import AscfError, EncodeError
 from .glyphs import render_grid_image
@@ -21,12 +22,14 @@ EPILOG = """examples:
   ascii-film encode clip.mp4 --output dist/my-film --config examples/demo-config.json
   ascii-film encode clip.mp4 -o www --columns 200 --title "Ocean" --force
   ascii-film inspect film.ascf
+  ascii-film live --output www-live
   ascii-film preview clip.mp4 --time 3.5 --columns 120
 """
 
 
-def _add_render_options(p: argparse.ArgumentParser) -> None:
-    p.add_argument("source", help="input video (MP4, MOV, ...)")
+def _add_render_options(p: argparse.ArgumentParser, source: bool = True) -> None:
+    if source:
+        p.add_argument("source", help="input video (MP4, MOV, ...)")
     p.add_argument("--config", help="JSON config file (CLI flags override it)")
     g = p.add_argument_group("geometry and timing")
     g.add_argument("--fps", type=int, help="output frame rate, 1-60 (default 24)")
@@ -135,6 +138,23 @@ def cmd_inspect(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_live(args: argparse.Namespace) -> int:
+    cfg = _config(args)
+    build_live(cfg, args.output, force=args.force, log=lambda msg: print(msg, file=sys.stderr))
+    return 0
+
+
+def _add_interaction_options(g) -> None:
+    g.add_argument("--no-lens", dest="lens", action="store_false", default=None,
+                   help="disable the cursor lens that parts and magnifies glyphs")
+    g.add_argument("--no-ripples", dest="ripples", action="store_false", default=None,
+                   help="disable ripples sent through the glyphs by cursor movement")
+    g.add_argument("--lens-radius", type=float, help="lens radius in cell widths (default 7)")
+    g.add_argument("--lens-strength", type=float,
+                   help="lens push/magnification 0..2.2 (default 1.4)")
+    g.add_argument("--ripple-strength", type=float, help="ripple push/swell multiplier 0..4 (default 1)")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ascii-film",
@@ -172,16 +192,22 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--loop-crossfade", type=float,
                    help="seconds of the ending dissolved into the opening for a seamless loop")
     g.add_argument("--font-license", help="license file to ship with the font")
-    g.add_argument("--no-lens", dest="lens", action="store_false", default=None,
-                   help="disable the cursor lens that parts and magnifies glyphs")
-    g.add_argument("--no-ripples", dest="ripples", action="store_false", default=None,
-                   help="disable ripples sent through the glyphs by cursor movement")
-    g.add_argument("--lens-radius", type=float, help="lens radius in cell widths (default 7)")
-    g.add_argument("--lens-strength", type=float,
-                   help="lens push/magnification 0..2.2 (default 1.4)")
-    g.add_argument("--ripple-strength", type=float, help="ripple push/swell multiplier 0..4 (default 1)")
+    _add_interaction_options(g)
     g.add_argument("--max-frames", type=int, help="stop after this many frames")
     p.set_defaults(func=cmd_encode)
+
+    p = sub.add_parser("live", help="build the live webcam page (a separate static site)",
+                       epilog="example:\n  ascii-film live --output www-live --columns 140",
+                       formatter_class=argparse.RawDescriptionHelpFormatter)
+    _add_render_options(p, source=False)
+    p.add_argument("--output", "-o", required=True, help="site directory to create (keep it separate)")
+    p.add_argument("--force", action="store_true", help="replace an existing output directory")
+    g = p.add_argument_group("page")
+    g.add_argument("--title", help="page title")
+    g.add_argument("--description", help="description for screen readers")
+    g.add_argument("--font-license", help="license file to ship with the font")
+    _add_interaction_options(g)
+    p.set_defaults(func=cmd_live)
 
     p = sub.add_parser("inspect", help="validate an .ascf file and print its structure")
     p.add_argument("file")

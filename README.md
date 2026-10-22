@@ -49,6 +49,37 @@ turn the physics off, **F** for fullscreen, **Space** to pause.
 
 ---
 
+## Live webcam mode — ASCII Mirror (`webcam` branch)
+
+> You are on the `webcam` branch. It adds a second, **separate** site that
+> draws your camera live in glyphs, with the same lens and ripples. The film
+> site in `www/` is unchanged.
+
+```bash
+git switch webcam
+ascii-film live --config examples/live-config.json --output www-live --force
+scripts/serve.sh www-live        # open http://localhost:8000/ and click "Start camera"
+```
+
+* **Everything stays in the browser.** Frames go from the camera to a hidden
+  canvas to glyphs and are never stored or sent anywhere. The page does
+  nothing until the visitor clicks **Start camera**.
+* **Same mapping as the films.** Font calibration happens in Python, exactly
+  as for encoded films, and the browser runs a JavaScript port of the tone
+  curve, glyph choice, variation and anti-flicker stabiliser
+  ([`web/camera.js`](web/camera.js)), with auto-levels smoothed over about
+  half a second so exposure changes glide.
+* **Controls:** **Space** freeze · **M** mirror · **[ / ]** bigger or smaller
+  letters (80–220 columns) · **T** colour theme · **I** lens on/off ·
+  **F** fullscreen. Move the cursor to push your own face around.
+* **Hosting:** upload `www-live/` like any static site. Browsers only allow
+  cameras on `https://` pages (or `localhost`); SiteGround's free Let's Encrypt
+  certificate and GitHub Pages both qualify.
+* **Speed:** mapping a 140×47 frame takes about 5 ms in Chromium. The
+  page runs at the camera's own frame rate.
+
+---
+
 ## How it works
 
 ```text
@@ -124,6 +155,7 @@ Want the green look from the demo screenshots by default? Encode with
 | `ascii-film inspect FILE.ascf` | Validate header, glyph table, index, timestamps and every frame. |
 | `ascii-film preview SRC --time 5 [--png out.png]` | Print (or rasterise) one frame — for tuning settings fast. |
 | `ascii-film probe SRC` | Show what ffprobe sees: size, rotation, SAR, fps, audio. |
+| `ascii-film live -o DIR` | Build the live webcam page as its own static site (`webcam` branch). |
 
 `ascii-film encode --help` lists every flag. Any option can also live in a JSON
 config (`--config file.json`); CLI flags override the file. Paths in a config

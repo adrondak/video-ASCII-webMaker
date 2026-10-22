@@ -9,6 +9,7 @@
 
 import { AscfDecoder, supportsDecompression } from "./decoder.js";
 import { FIELD_DEFAULTS, GlyphField } from "./field.js";
+import { wirePointer } from "./pointer.js";
 import { AtlasRenderer } from "./renderer.js";
 
 const FONT_FAMILY = "ASCIIFilmFont";
@@ -422,35 +423,9 @@ function wireControls(player) {
   showControls();
 }
 
-/**
- * Pointer -> lens position and ripples, in canvas device pixels. Events are
- * taken from the whole stage so overlays (the big play button, status text)
- * never block the lens.
- */
 function wireField(player) {
-  const canvas = ui.canvas;
-  const field = player.field;
-  const toDevice = (e) => {
-    const r = canvas.getBoundingClientRect();
-    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return null;
-    return [(e.clientX - r.left) * (canvas.width / r.width), (e.clientY - r.top) * (canvas.height / r.height)];
-  };
-  const leave = () => { field.clearPointer(); player.wakeField(); };
-  ui.stage.addEventListener("pointermove", (e) => {
-    const p = toDevice(e);
-    if (p) field.setPointer(...p); else field.clearPointer();
-    player.wakeField();
-  });
-  ui.stage.addEventListener("pointerdown", (e) => {
-    const p = toDevice(e);
-    if (!p) return;
-    field.setPointer(...p);
-    field.pulse(...p, 1.6);
-    player.wakeField();
-  });
-  ui.stage.addEventListener("pointerleave", leave);
-  ui.stage.addEventListener("pointercancel", leave);
-  canvas.classList.toggle("lens-on", field.enabled && player.m.interaction.lens);
+  wirePointer(ui.stage, ui.canvas, () => player.field, () => player.wakeField());
+  ui.canvas.classList.toggle("lens-on", player.field.enabled && player.m.interaction.lens);
 }
 
 function fullscreenSupported() {

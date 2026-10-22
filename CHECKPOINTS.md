@@ -22,8 +22,9 @@ git diff checkpoint-04-packaging checkpoint-05-player -- web/
 | `checkpoint-06-hardening` | Seamless loops (`loop_crossfade` dissolve + stabiliser splice), playback profiler, server/test fixes. | …make looping installations. |
 | `checkpoint-07-delivery` | The finished `www/` ocean site, full README, SiteGround guide, ASCF spec, technical report, zip packaging. | …just use the tool. |
 | `checkpoint-08-interaction` | Glyph physics: a cursor lens that parts and magnifies the glyphs, ripples from movement and clicks, underdamped springs that wag glyphs home; block-based repaint with pixel-exact restore; `--lens-*`/`--ripple-*` options. | …make the text-art interactive. |
+| `checkpoint-09-webcam` *(on the `webcam` branch)* | Live webcam mode: `ascii-film live` builds a separate `www-live/` site; `web/camera.js` ports the glyph mapping and stabiliser to JavaScript; shared pointer wiring; fake-camera browser tests. | …make interactive mirrors or installations. |
 
-`main` has the latest checkpoint plus small fixes, docs and CI made after it.
+`main` has the latest checkpoint plus small fixes, docs and CI made after it. The live webcam work lives on the `webcam` branch (`checkpoint-09-webcam`) and is not merged into `main`.
 
 ## Using a checkpoint
 
