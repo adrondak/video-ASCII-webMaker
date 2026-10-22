@@ -1,14 +1,15 @@
 # ASCII Film
 
 [![tests](https://github.com/adrondak/video-ASCII-webMaker/actions/workflows/ci.yml/badge.svg)](https://github.com/adrondak/video-ASCII-webMaker/actions/workflows/ci.yml)
-[![live demo](https://img.shields.io/badge/live%20demo-open-2ea44f)](https://adrondak.github.io/video-ASCII-webMaker/)
+[![live demo: waves](https://img.shields.io/badge/live%20demo-waves-2ea44f)](https://adrondak.com/waves/)
+[![live demo: webcam mirror](https://img.shields.io/badge/live%20demo-webcam%20mirror-2ea44f)](https://adrondak.com/mirror/)
 [![release](https://img.shields.io/github/v/release/adrondak/video-ASCII-webMaker?label=site%20zip)](https://github.com/adrondak/video-ASCII-webMaker/releases/latest)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 **Turn any video clip into a website where the picture is made of real text characters** —
 and the letters physically react when you move your mouse over them.
 
-### ▶ [Open the live demo](https://adrondak.github.io/video-ASCII-webMaker/)
+### ▶ [Watch the waves](https://adrondak.com/waves/) · [Try the webcam mirror](https://adrondak.com/mirror/)
 
 <p align="center"><img src="docs/demo.gif" alt="Waves drawn in text characters; a lens of magnified letters follows the cursor and the glyphs ripple and wag back into place" width="560"></p>
 
@@ -23,7 +24,7 @@ turn the physics off, **F** for fullscreen, **Space** to pause.
 
 | You want to… | Do this |
 |---|---|
-| **Just look at it** | [Open the live demo](https://adrondak.github.io/video-ASCII-webMaker/). Nothing to install. |
+| **Just look at it** | [adrondak.com/waves](https://adrondak.com/waves/) (also on [GitHub Pages](https://adrondak.github.io/video-ASCII-webMaker/)) and the webcam mirror at [adrondak.com/mirror](https://adrondak.com/mirror/). Nothing to install. |
 | **Put this exact site on your own website** | Download [`ascii-film-ocean-site.zip`](https://github.com/adrondak/video-ASCII-webMaker/releases/latest), upload it to your host and unzip. [SiteGround / cPanel guide](docs/SITEGROUND.md). |
 | **Make one from your own video** | [Quick start](#quick-start-macos): install FFmpeg + Python, run one command, upload the folder it makes. |
 | **Understand how it works** | [How it works](#how-it-works) below, the [file format spec](docs/ASCF.md), and the [measured results](docs/REPORT.md). |
@@ -54,6 +55,8 @@ turn the physics off, **F** for fullscreen, **Space** to pause.
 > You are on the `webcam` branch. It adds a second, **separate** site that
 > draws your camera live in glyphs, with the same lens and ripples. The film
 > site in `www/` is unchanged.
+>
+> **Try it live: [adrondak.com/mirror](https://adrondak.com/mirror/)**
 
 ```bash
 git switch webcam

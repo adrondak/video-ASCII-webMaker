@@ -45,6 +45,8 @@ DirectoryIndex index.html
 </IfModule>
 
 <IfModule mod_headers.c>
-  # Camera for this site only; no microphone, no geolocation.
+  # Camera for this site only; no microphone, no geolocation. Needed on
+  # SiteGround: its servers send "camera=()" on every site, which blocks the
+  # camera in Chrome; this later header overrides it for this folder.
   Header set Permissions-Policy "camera=(self), microphone=(), geolocation=()"
 </IfModule>
