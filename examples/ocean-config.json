@@ -1,0 +1,22 @@
+{
+  "_comment": "Settings used to build www/ from assets/video/1080ocean.mp4.",
+  "fps": 24,
+  "columns": 220,
+  "font": "../assets/fonts/DejaVuSansMono-Bold.ttf",
+  "line_height": 1.0,
+  "glyphs": " .'`^\",:;Il!i><~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$",
+  "gamma": 0.65,
+  "contrast": 1.05,
+  "brightness": -0.05,
+  "detail": 0.4,
+  "variation": 1.0,
+  "stability": 0.3,
+  "loop_crossfade": 1.0,
+  "foreground": "#e9f3f4",
+  "background": "#05090c",
+  "title": "Ocean",
+  "description": "A green ocean wave curls and breaks into white foam beneath a pale sky, drawn entirely with moving text characters.",
+  "loop": true,
+  "autoplay": "muted",
+  "audio": false
+}

@@ -3,12 +3,12 @@
 Turn a video into a moving image made of **real typographic characters**,
 encoded once on your machine and played back by a tiny static Canvas website.
 
-> **Checkpoint 05 — full web player.** Replaces the minimal player with a
-> glyph-atlas Canvas renderer (integer device-pixel cells, partial redraw of
-> changed cells, HiDPI), a performance.now()/audio master clock that skips
-> late frames, controls (play/pause, scrub, time, mute/volume, loop, colour
-> theme, fullscreen), keyboard shortcuts, reduced-motion handling, loading
-> and error states, and a Playwright suite for Chromium, Firefox and WebKit.
+> **Checkpoint 06 — hardening.** Adds a seamless-loop option
+> (`loop_crossfade`: the ending dissolves into the opening in linear light,
+> and the stabiliser is spliced so the loop point never shimmers), a playback
+> profiler (`node scripts/profile-player.mjs <dir>`), a backlog fix for the
+> preview server, and more tests. The next checkpoint adds the finished
+> `www/` site and full documentation.
 
 ## Setup (macOS)
 

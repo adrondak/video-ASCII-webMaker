@@ -140,3 +140,23 @@ def test_preview_text(fixtures_dir, capsys):
                  "--columns", "80"]) == 0
     lines = capsys.readouterr().out.splitlines()
     assert len(lines[0]) == 80 and len(lines) > 10
+
+
+def test_loop_crossfade_makes_seam_continuous(fixtures_dir, tmp_path, landscape_out):
+    out = tmp_path / "xfade"
+    assert _encode(fixtures_dir / "landscape.mp4", out, "--loop-crossfade", "0.5") == 0
+    m = _manifest(out)
+    assert m["frameCount"] == 108 and m["encoding"]["loopCrossfadeFrames"] == 12
+    plain = AscfFile.open(landscape_out / "film.ascf")
+    faded = AscfFile.open(out / "film.ascf")
+    jump_plain = (plain.frame(119) != plain.frame(0)).mean()
+    jump_faded = (faded.frame(107) != faded.frame(0)).mean()
+    assert jump_faded < jump_plain / 3
+    # Past the crossfade the film is untouched.
+    assert (faded.frame(60) == plain.frame(60)).mean() > 0.95
+
+
+def test_crossfade_with_audio_rejected(fixtures_dir, tmp_path, capsys):
+    assert _encode(fixtures_dir / "landscape.mp4", tmp_path / "o", "--audio",
+                   "--loop-crossfade", "0.5") == 2
+    assert "loop_crossfade" in capsys.readouterr().err

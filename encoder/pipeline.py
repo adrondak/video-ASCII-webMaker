@@ -60,6 +60,9 @@ def encode(cfg: EncodeConfig, source: str | Path, output: str | Path, force: boo
     info = probe(source)
     log(f"source:   {info.describe()}")
     check_output_path(output, source, force)
+    if cfg.audio and info.has_audio and cfg.loop_crossfade > 0:
+        raise EncodeError("loop_crossfade cannot be combined with --audio in v1 (the soundtrack "
+                          "is not dissolved); drop one of them")
 
     engine = FrameEngine(cfg, info)
     if engine.grid_warning:
@@ -84,11 +87,11 @@ def encode(cfg: EncodeConfig, source: str | Path, output: str | Path, force: boo
         if cfg.auto_levels:
             log(f"levels:   tone {levels[0]:.3f} .. {levels[1]:.3f} (auto)")
         progress = Progress(est_frames)
+        engine.on_frame = progress.update
         with AscfWriter(staging / ANIMATION_FILE, engine.columns, engine.rows, cfg.fps, 1,
                         engine.glyphs.chars, cfg.keyframe_interval) as writer:
             for grid in engine.grids():
                 writer.add_frame(grid)
-                progress.update(writer.stats.frames)
         progress.update(writer.stats.frames, final=True)
         stats = writer.stats
         duration = stats.frames / cfg.fps
@@ -148,6 +151,7 @@ def encode(cfg: EncodeConfig, source: str | Path, output: str | Path, force: boo
                 "variation": cfg.variation, "seed": cfg.seed,
                 "stability": cfg.stability if cfg.stabilization else 0.0,
                 "keyframeInterval": cfg.keyframe_interval,
+                "loopCrossfadeFrames": engine.stats.crossfade_frames,
                 "sourceFrameRate": str(info.frame_rate) if info.frame_rate else None,
                 "resampledToFps": cfg.fps,
             },
@@ -161,9 +165,13 @@ def encode(cfg: EncodeConfig, source: str | Path, output: str | Path, force: boo
         "deltas": stats.deltas, "duration": duration, "columns": engine.columns,
         "rows": engine.rows, "animation_bytes": stats.total_bytes, "total_bytes": total,
         "audio": audio_name is not None, "cuts": engine.stats.cuts, "elapsed": elapsed,
+        "crossfade_frames": engine.stats.crossfade_frames,
     }
     log(f"frames:   {stats.frames} ({stats.keyframes} key / {stats.deltas} delta), "
         f"{duration:.3f}s, {engine.stats.cuts} hard cut(s) detected")
+    if engine.stats.crossfade_frames:
+        log(f"loop:     last {engine.stats.crossfade_frames} frames dissolved into the opening "
+            "for a seamless loop")
     log(f"output:   {output}/ — animation {_human(stats.total_bytes)}, "
         f"total {_human(total)}, in {elapsed:.1f}s")
     log(f"preview:  scripts/serve.sh {output}  ->  http://localhost:8000/")

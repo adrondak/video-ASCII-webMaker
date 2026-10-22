@@ -61,7 +61,8 @@ OPTION_NAMES = ["fps", "columns", "font", "font_size", "line_height", "allow_pro
                 "glyphs", "brightness", "contrast", "gamma", "auto_levels", "invert", "detail",
                 "dither", "variation", "seed", "foreground", "background", "stability",
                 "stabilization", "cut_threshold", "scene_cuts", "title", "description",
-                "keyframe_interval", "audio", "autoplay", "loop", "font_license", "max_frames"]
+                "keyframe_interval", "audio", "autoplay", "loop", "font_license", "max_frames",
+                "loop_crossfade"]
 
 
 def _overrides(args: argparse.Namespace) -> dict:
@@ -167,6 +168,8 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--autoplay", choices=["muted", "off"],
                    help="'muted' starts playing on load (default); 'off' waits for a click")
     g.add_argument("--no-loop", dest="loop", action="store_false", default=None)
+    g.add_argument("--loop-crossfade", type=float,
+                   help="seconds of the ending dissolved into the opening for a seamless loop")
     g.add_argument("--font-license", help="license file to ship with the font")
     g.add_argument("--max-frames", type=int, help="stop after this many frames")
     p.set_defaults(func=cmd_encode)

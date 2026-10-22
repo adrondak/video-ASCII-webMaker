@@ -63,6 +63,7 @@ class EncodeConfig:
 
     # Container
     keyframe_interval: int = 48
+    loop_crossfade: float = 0.0  # seconds of tail dissolved into the head for a seamless loop
 
     # Package / player
     title: str = "ASCII Film"
@@ -103,6 +104,7 @@ RANGES: dict[str, tuple[float, float]] = {
     "stability": (0.0, 1.0),
     "cut_threshold": (0.01, 1.0),
     "keyframe_interval": (1, 10000),
+    "loop_crossfade": (0.0, 5.0),
 }
 
 INT_FIELDS = {"fps", "columns", "min_rows", "max_rows", "oversample_x", "oversample_y",
