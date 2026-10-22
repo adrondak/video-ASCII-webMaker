@@ -20,7 +20,8 @@ from .errors import EncodeError
 from .probe import MediaInfo, require_tools
 
 WEB_DIR = REPO_ROOT / "web"
-WEB_FILES = ["index.html", "player.css", "player.js", "decoder.js", "renderer.js", ".htaccess"]
+WEB_FILES = ["index.html", "player.css", "player.js", "decoder.js", "renderer.js", "field.js",
+             ".htaccess"]
 ANIMATION_FILE = "film.ascf"
 AUDIO_FILE = "audio.m4a"
 MANIFEST_FILE = "manifest.json"

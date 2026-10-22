@@ -7,6 +7,7 @@ export default defineConfig({
   testDir: "tests/e2e",
   timeout: 30_000,
   fullyParallel: true,
+  workers: 2, // timing assertions (A/V sync) need CPU headroom
   reporter: [["list"]],
   outputDir: "tests/artifacts/playwright",
   use: { baseURL: `http://127.0.0.1:${PORT}/`, viewport: { width: 1280, height: 720 } },

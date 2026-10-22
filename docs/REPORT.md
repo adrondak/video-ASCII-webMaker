@@ -39,6 +39,24 @@ budget at 24 fps is 41.7 ms, so there is ample headroom for slower laptops and
 phones. (WebKit's 2 "missing" frames are the first frame boundary of the
 measurement window, not drops: skipped = 0.)
 
+## Glyph lens and ripples (checkpoint 08)
+
+Cursor interaction runs a damped-spring simulation over all 16 280 cells
+(about 1 ms per step in Node) and repaints only 8×8-cell blocks that contain
+visibly displaced glyphs. Measured in headless Chromium (software rendering,
+1440×810 at DPR 2) during an aggressive swipe followed by release:
+
+| Metric | Value |
+|---|---|
+| Field repaint per animation frame | median 5.1 ms, p95 20.8 ms |
+| Blocks repainted | median 59, peak 192 of 280 |
+| Canvas after everything settles | pixel-identical to before the interaction (also an E2E assertion) |
+| Film playback with no interaction | unchanged: 192/192 frames, 0 skipped |
+
+Headless browsers rasterise canvases in software; GPU-accelerated desktop
+browsers are typically several times faster, so the p95 here is a pessimistic
+bound. The physics stays off for visitors who prefer reduced motion.
+
 ## A/V sync
 
 With `--audio`, the audio element is the master clock and the frame shown is
@@ -54,8 +72,9 @@ is being decoded.)
 |---|---|
 | `pytest` (unit + integration: calibration, mapping, aspect, tone extremes, hysteresis, cuts, container round-trips, corrupt-file cases, timestamps, determinism, CLI encode/inspect/preview, portrait + rotated sources, silent source, audio opt-in, `--force`, crossfade) | **84 passed** |
 | `npm test` (Node: JS decoder vs Python encoder, seeking, concurrency, corruption) | **8 passed** |
-| Playwright Chromium | **13 passed** |
-| Playwright WebKit | **13 passed** |
+| Node glyph-field physics (outward push, magnification, overshoot then exact rest, ripple travel, determinism) | **4 passed** |
+| Playwright Chromium (incl. lens/ripple restore and `I` toggle) | **15 passed** |
+| Playwright WebKit | **15 passed** |
 | Playwright Firefox | **not run** — see below |
 
 Determinism: encoding the same source twice produces byte-identical

@@ -30,6 +30,13 @@
   },
   "loop": true,
   "autoplay": "muted",
+  "interaction": {
+    "lens": true,
+    "lensRadius": 7.0,
+    "lensStrength": 1.4,
+    "ripples": true,
+    "rippleStrength": 1.0
+  },
   "generator": "ascii-film 1.0.0",
   "encoding": {
     "glyphs": " _`.',-:~^\";!/*|><r+)(?c[]vlL%xzjt}{1fiYJnuCowIakXh$Zmpq#bdU80O&WQ@MB",

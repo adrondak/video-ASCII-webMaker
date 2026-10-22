@@ -62,7 +62,8 @@ OPTION_NAMES = ["fps", "columns", "font", "font_size", "line_height", "allow_pro
                 "dither", "variation", "seed", "foreground", "background", "stability",
                 "stabilization", "cut_threshold", "scene_cuts", "title", "description",
                 "keyframe_interval", "audio", "autoplay", "loop", "font_license", "max_frames",
-                "loop_crossfade"]
+                "loop_crossfade", "lens", "ripples", "lens_radius", "lens_strength",
+                "ripple_strength"]
 
 
 def _overrides(args: argparse.Namespace) -> dict:
@@ -171,6 +172,14 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--loop-crossfade", type=float,
                    help="seconds of the ending dissolved into the opening for a seamless loop")
     g.add_argument("--font-license", help="license file to ship with the font")
+    g.add_argument("--no-lens", dest="lens", action="store_false", default=None,
+                   help="disable the cursor lens that parts and magnifies glyphs")
+    g.add_argument("--no-ripples", dest="ripples", action="store_false", default=None,
+                   help="disable ripples sent through the glyphs by cursor movement")
+    g.add_argument("--lens-radius", type=float, help="lens radius in cell widths (default 7)")
+    g.add_argument("--lens-strength", type=float,
+                   help="lens push/magnification 0..2.2 (default 1.4)")
+    g.add_argument("--ripple-strength", type=float, help="ripple push/swell multiplier 0..4 (default 1)")
     g.add_argument("--max-frames", type=int, help="stop after this many frames")
     p.set_defaults(func=cmd_encode)
 

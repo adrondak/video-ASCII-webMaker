@@ -34,6 +34,8 @@ html, body {
 }
 
 body.playing.ready:not(.show-controls) #stage { cursor: none; }
+#film.lens-on { cursor: none; } /* the bulge in the glyphs is the cursor */
+#film { touch-action: none; } /* let a finger drag the lens instead of scrolling */
 
 #status {
   position: absolute;

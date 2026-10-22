@@ -18,5 +18,10 @@
   "description": "A green ocean wave curls and breaks into white foam beneath a pale sky, drawn entirely with moving text characters.",
   "loop": true,
   "autoplay": "muted",
-  "audio": false
+  "audio": false,
+  "lens": true,
+  "lens_radius": 7,
+  "lens_strength": 1.4,
+  "ripples": true,
+  "ripple_strength": 1.0
 }

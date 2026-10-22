@@ -8,6 +8,7 @@
 // skipped rather than slowing the film down.
 
 import { AscfDecoder, supportsDecompression } from "./decoder.js";
+import { FIELD_DEFAULTS, GlyphField } from "./field.js";
 import { AtlasRenderer } from "./renderer.js";
 
 const FONT_FAMILY = "ASCIIFilmFont";
@@ -55,6 +56,15 @@ export function validateManifest(m) {
   for (const k of ["size", "cellWidth", "cellHeight", "ascent", "lineHeight"]) if (!posNum(f[k])) fail(`font.${k} must be a positive number`);
   if (typeof f.descent !== "number" || f.descent < 0) fail("font.descent must be >= 0");
   if (!m.theme || !HEX.test(m.theme.foreground) || !HEX.test(m.theme.background)) fail("theme colours must be #rrggbb");
+  const ix = m.interaction && typeof m.interaction === "object" ? m.interaction : {};
+  const num = (v, lo, hi, d) => (typeof v === "number" && v >= lo && v <= hi ? v : d);
+  const interaction = {
+    lens: ix.lens !== undefined ? ix.lens === true : FIELD_DEFAULTS.lens,
+    ripples: ix.ripples !== undefined ? ix.ripples === true : FIELD_DEFAULTS.ripples,
+    lensRadius: num(ix.lensRadius, 1, 40, FIELD_DEFAULTS.lensRadius),
+    lensStrength: num(ix.lensStrength, 0, 2.2, FIELD_DEFAULTS.lensStrength),
+    rippleStrength: num(ix.rippleStrength, 0, 4, FIELD_DEFAULTS.rippleStrength),
+  };
   return {
     ...m,
     title: typeof m.title === "string" ? m.title.slice(0, 200) : "ASCII Film",
@@ -62,6 +72,7 @@ export function validateManifest(m) {
     audio: m.audio || null,
     loop: m.loop !== false,
     autoplay: m.autoplay === "muted" ? "muted" : "off",
+    interaction,
   };
 }
 
@@ -136,6 +147,24 @@ class Player {
     this.ended = false;
     this.themeIndex = Math.min(Number(store.get("theme")) || 0, THEMES.length - 1);
     this.stats = { drawn: 0, framesShown: 0, skipped: 0 };
+    this.field = renderer.field;
+    this.fieldRaf = 0;
+  }
+
+  /** Keep the lens/ripple simulation running while anything moves. */
+  wakeField() {
+    if (!this.field || this.fieldRaf) return;
+    this.fieldRaf = requestAnimationFrame((now) => {
+      this.fieldRaf = 0;
+      if (this.renderer.animate(now)) this.wakeField();
+    });
+  }
+
+  setInteraction(on) {
+    if (!this.field) return;
+    this.field.setEnabled(on);
+    ui.canvas.classList.toggle("lens-on", on && this.m.interaction.lens);
+    this.wakeField();
   }
 
   get playing() { return this.clock.playing; }
@@ -202,6 +231,7 @@ class Player {
     const r = ui.stage.getBoundingClientRect();
     this.renderer.resize(r.width, r.height, window.devicePixelRatio || 1);
     this.shown = -1;
+    if (this.field) this.field.clearPointer();
     this._schedule();
   }
 
@@ -294,6 +324,7 @@ function wireControls(player) {
   stage.addEventListener("pointerdown", showControls);
   ui.controls.addEventListener("focusin", showControls);
   ui.canvas.addEventListener("click", () => { player.toggle(); showControls(); });
+  if (player.field) wireField(player);
   ui.canvas.addEventListener("dblclick", () => toggleFullscreen());
   ui.big.addEventListener("click", () => { player.play(); showControls(); });
   ui.play.addEventListener("click", () => { player.toggle(); showControls(); });
@@ -369,6 +400,7 @@ function wireControls(player) {
       case "f": case "F": toggleFullscreen(); break;
       case "l": case "L": player.setLoop(!player.loop); break;
       case "t": case "T": player.applyTheme(player.themeIndex + 1); break;
+      case "i": case "I": if (player.field) player.setInteraction(!player.field.enabled); break;
       default: return;
     }
     showControls();
@@ -388,6 +420,37 @@ function wireControls(player) {
   });
   ui.canvas.addEventListener("contextrestored", () => player.resize());
   showControls();
+}
+
+/**
+ * Pointer -> lens position and ripples, in canvas device pixels. Events are
+ * taken from the whole stage so overlays (the big play button, status text)
+ * never block the lens.
+ */
+function wireField(player) {
+  const canvas = ui.canvas;
+  const field = player.field;
+  const toDevice = (e) => {
+    const r = canvas.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return null;
+    return [(e.clientX - r.left) * (canvas.width / r.width), (e.clientY - r.top) * (canvas.height / r.height)];
+  };
+  const leave = () => { field.clearPointer(); player.wakeField(); };
+  ui.stage.addEventListener("pointermove", (e) => {
+    const p = toDevice(e);
+    if (p) field.setPointer(...p); else field.clearPointer();
+    player.wakeField();
+  });
+  ui.stage.addEventListener("pointerdown", (e) => {
+    const p = toDevice(e);
+    if (!p) return;
+    field.setPointer(...p);
+    field.pulse(...p, 1.6);
+    player.wakeField();
+  });
+  ui.stage.addEventListener("pointerleave", leave);
+  ui.stage.addEventListener("pointercancel", leave);
+  canvas.classList.toggle("lens-on", field.enabled && player.m.interaction.lens);
 }
 
 function fullscreenSupported() {
@@ -437,6 +500,9 @@ async function main() {
   }
 
   const renderer = new AtlasRenderer(ui.canvas, manifest, decoder.glyphs, FONT_FAMILY);
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const ix = manifest.interaction;
+  if ((ix.lens || ix.ripples) && !reduceMotion) renderer.attachField(new GlyphField(manifest.columns, manifest.rows, ix));
   const err = renderer.metricError();
   if (err > 0.02) console.warn(`ASCII Film: webfont advance differs from calibration by ${(err * 100).toFixed(1)}%`);
 
@@ -447,7 +513,6 @@ async function main() {
   wireControls(player);
   setStatus("");
 
-  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (manifest.autoplay === "muted" && !reduceMotion) {
     if (audio) audio.muted = true;
     await player.play();

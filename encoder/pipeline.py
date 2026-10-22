@@ -142,6 +142,11 @@ def encode(cfg: EncodeConfig, source: str | Path, output: str | Path, force: boo
             "theme": {"foreground": cfg.foreground, "background": cfg.background},
             "loop": cfg.loop,
             "autoplay": cfg.autoplay,
+            "interaction": {
+                "lens": cfg.lens, "lensRadius": cfg.lens_radius,
+                "lensStrength": cfg.lens_strength, "ripples": cfg.ripples,
+                "rippleStrength": cfg.ripple_strength,
+            },
             "generator": f"ascii-film {__version__}",
             "encoding": {
                 "glyphs": "".join(engine.glyphs.chars),

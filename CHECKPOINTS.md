@@ -1,6 +1,6 @@
 # Checkpoints
 
-This repository was built in seven phases, and each phase is an annotated git
+This repository was built in seven phases plus one extension, and each phase is an annotated git
 tag you can clone on its own. Every checkpoint is a working project at that
 stage — its README says what it can do and its tests pass.
 
@@ -21,6 +21,7 @@ git diff checkpoint-04-packaging checkpoint-05-player -- web/
 | `checkpoint-05-player` | Production player: glyph-atlas Canvas renderer at integer device pixels with changed-cell redraw, wall/audio master clock with frame skipping, controls, keyboard, themes, fullscreen, reduced motion, errors; Range-capable preview server; Playwright E2E. | …embed or restyle the player. |
 | `checkpoint-06-hardening` | Seamless loops (`loop_crossfade` dissolve + stabiliser splice), playback profiler, server/test fixes. | …make looping installations. |
 | `checkpoint-07-delivery` | The finished `www/` ocean site, full README, SiteGround guide, ASCF spec, technical report, zip packaging. | …just use the tool. |
+| `checkpoint-08-interaction` | Glyph physics: a cursor lens that parts and magnifies the glyphs, ripples from movement and clicks, underdamped springs that wag glyphs home; block-based repaint with pixel-exact restore; `--lens-*`/`--ripple-*` options. | …make the text-art interactive. |
 
 `main` always points at the latest checkpoint.
 

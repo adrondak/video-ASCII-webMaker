@@ -98,6 +98,7 @@ test("stops at the end when loop is off", async ({ page }) => {
   await page.keyboard.press("l");
   await page.evaluate(() => window.asciiFilm.seek(4.7));
   await page.waitForFunction(() => window.asciiFilm.ended);
+  await settled(page);
   expect(await page.evaluate(() => [window.asciiFilm.playing, window.asciiFilm.shown])).toEqual([false, 119]);
 });
 
@@ -165,6 +166,46 @@ test("audio film waits for a click, then audio is the master clock", async ({ pa
   expect(w.errors).toEqual([]);
 });
 
+test("lens parts the glyphs, ripples spread, and everything returns exactly", async ({ page }) => {
+  await page.goto("silent/");
+  await ready(page);
+  await page.evaluate(() => window.asciiFilm.pause());
+  await settled(page);
+  const snapshot = () => page.evaluate(() => document.getElementById("film").toDataURL());
+  const before = await snapshot();
+  const box = await page.locator("#film").boundingBox();
+  await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.5);
+  await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5, { steps: 10 });
+  await page.waitForTimeout(500);
+  const live = await page.evaluate(() => {
+    const f = window.asciiFilm.field;
+    let moved = 0, maxScale = 1;
+    for (let i = 0; i < f.moved.length; i++) { moved += f.moved[i]; maxScale = Math.max(maxScale, f.s[i]); }
+    return { moved, maxScale, ripples: f.ripples.length, cursor: getComputedStyle(document.getElementById("film")).cursor };
+  });
+  expect(live.moved).toBeGreaterThan(30);
+  expect(live.maxScale).toBeGreaterThan(1.5);
+  expect(live.cursor).toBe("none");
+  expect(await snapshot()).not.toBe(before);
+  await page.mouse.move(box.x + box.width + 20, box.y + 10);
+  await page.waitForFunction(() => !window.asciiFilm.field.active, null, { timeout: 15000 });
+  await page.waitForTimeout(50);
+  expect(await snapshot()).toBe(before); // every glyph wagged home, pixel for pixel
+});
+
+test("I toggles the interaction off and on", async ({ page }) => {
+  await page.goto("silent/");
+  await ready(page);
+  await page.keyboard.press("i");
+  const box = await page.locator("#film").boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 5 });
+  await page.waitForTimeout(200);
+  expect(await page.evaluate(() => window.asciiFilm.field.moved.some((m) => m))).toBe(false);
+  await page.keyboard.press("i");
+  await page.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2, { steps: 5 });
+  await page.waitForFunction(() => window.asciiFilm.field.moved.some((m) => m));
+});
+
 test("unsupported browser shows a clear message", async ({ page }) => {
   await page.addInitScript(() => { delete window.DecompressionStream; });
   await page.goto("silent/");
@@ -195,6 +236,7 @@ test("reduced motion does not autoplay", async ({ browser }) => {
   await page.goto("silent/");
   await ready(page);
   expect(await page.evaluate(() => window.asciiFilm.playing)).toBe(false);
+  expect(await page.evaluate(() => window.asciiFilm.field)).toBeNull(); // no glyph physics either
   await expect(page.locator("#big-play")).toBeVisible();
   await ctx.close();
 });

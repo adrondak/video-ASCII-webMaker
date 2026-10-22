@@ -75,6 +75,13 @@ class EncodeConfig:
     audio: bool = False  # opt-in: package the source soundtrack as audio.m4a
     audio_bitrate: str = "160k"
 
+    # Pointer interaction in the player
+    lens: bool = True  # glyphs part and magnify around the cursor
+    lens_radius: float = 7.0  # in cell widths
+    lens_strength: float = 1.4  # centre magnification is 1 + this
+    ripples: bool = True  # cursor movement sends ripples through the glyphs
+    ripple_strength: float = 1.0  # multiplier on ripple push and swell
+
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
@@ -105,11 +112,15 @@ RANGES: dict[str, tuple[float, float]] = {
     "cut_threshold": (0.01, 1.0),
     "keyframe_interval": (1, 10000),
     "loop_crossfade": (0.0, 5.0),
+    "lens_radius": (1.0, 40.0),
+    "lens_strength": (0.0, 2.2),
+    "ripple_strength": (0.0, 4.0),
 }
 
 INT_FIELDS = {"fps", "columns", "min_rows", "max_rows", "oversample_x", "oversample_y",
               "max_frames", "seed", "keyframe_interval"}
-BOOL_FIELDS = {"allow_proportional_font", "auto_levels", "invert", "stabilization", "loop", "audio"}
+BOOL_FIELDS = {"allow_proportional_font", "auto_levels", "invert", "stabilization", "loop", "audio",
+               "lens", "ripples"}
 STR_FIELDS = {"font", "font_license", "glyphs", "title", "description", "foreground", "background",
               "autoplay", "audio_bitrate"}
 

@@ -12,7 +12,11 @@ character animation on a Canvas — no video file, no server code, no build step
 ![Detail of the glyph rendering at 100%](docs/ocean-detail.png)
 
 The finished demo is in [`www/`](www/): a self-contained, looping, silent site
-(2.9 MB) built from a 21-second 1080p ocean clip. Upload that folder to any
+(2.9 MB) built from a 21-second 1080p ocean clip. Move the cursor over it and
+the glyphs physically react: they part and magnify around the cursor, ripple
+outward as it moves, and wag back into place when it leaves.
+
+![The glyph lens: characters part and swell around the cursor](docs/ocean-lens.png) Upload that folder to any
 static host — see [Hosting on SiteGround](docs/SITEGROUND.md).
 
 **Learning the technique?** The repository is tagged at every stage of the
@@ -48,6 +52,12 @@ clip.mp4 ─ ffprobe ─ ffmpeg fps+scale ─ linear-light cells ─ tone curve
 6. **Play.** The browser decompresses frames with `DecompressionStream`, draws
    glyphs from a pre-rendered atlas at integer device pixels, and times frames
    from a wall clock (or the audio element when there is sound).
+7. **Touch.** Each glyph is also a damped spring. A Gaussian bulge around the
+   pointer pushes glyphs outward and scales them up (a lens made of the
+   letters themselves); pointer movement launches ripple rings; underdamped
+   springs make every glyph overshoot and wag home. Only 8×8-cell blocks that
+   contain visibly moving glyphs are repainted, and resting glyphs are drawn
+   from the same tiles as normal frames, so the picture returns pixel-exact.
 
 ## Quick start (macOS)
 
@@ -107,6 +117,10 @@ file are relative to that file.
 | `--foreground / --background` | `#eeeeee` / `#101010` | Light-on-dark keeps the source polarity; dark-on-light inverts mapping automatically. `--invert` flips it. |
 | `--autoplay` | `muted` | `muted` starts on load and loops; `off` waits for a click. |
 | `--audio` | off | Opt-in: package the soundtrack as AAC `audio.m4a`; it then becomes the master clock. |
+| `--no-lens` / `--no-ripples` | on / on | Turn off the cursor lens or the ripples. |
+| `--lens-radius` | 7 | Lens radius in cell widths. |
+| `--lens-strength` | 1.4 | Push and magnification: the centre is magnified 1 + this (0–2.2). |
+| `--ripple-strength` | 1 | Multiplier on how hard ripples push and swell glyphs (0–4). |
 
 The demo's settings are in [`examples/ocean-config.json`](examples/ocean-config.json).
 
@@ -114,7 +128,7 @@ The demo's settings are in [`examples/ocean-config.json`](examples/ocean-config.
 
 ```text
 www/
-  index.html  player.css  player.js  decoder.js  renderer.js   ← the player (no dependencies)
+  index.html  player.css  player.js  decoder.js  renderer.js  field.js  ← the player (no dependencies)
   film.ascf                                                    ← the animation
   manifest.json                                                ← grid, timing, font metrics, theme
   font.woff2  FONT-LICENSE.txt                                 ← bundled licensed webfont
@@ -145,15 +159,17 @@ Correct MIME types help but are not required: `.js` → `text/javascript`,
 Controls appear on mouse movement, tap or keyboard focus and fade while
 playing. Keyboard: **Space/K** play-pause · **←/→** seek 5 s (**Shift** = one
 frame) · **Home** start · **L** loop · **T** colour theme · **F** fullscreen ·
-**M** mute (films with audio). Visitors who prefer reduced motion get a paused
-first frame and a play button instead of autoplay.
+**I** glyph lens/ripples on-off · **M** mute (films with audio). Click or tap
+sends a shockwave through the glyphs; on touch screens, drag a finger to move
+the lens. Visitors who prefer reduced motion get a paused first frame, a play
+button instead of autoplay, and no glyph physics.
 
 ## Testing
 
 ```bash
 scripts/make-fixture.sh                 # synthetic test videos (FFmpeg)
 pytest -q                               # 84 Python unit + integration tests
-npm test                                # Node decoder tests
+npm test                                # Node decoder + glyph-physics tests
 npm install && npm run e2e:install
 npm run e2e                             # Playwright: Chromium, Firefox, WebKit
 node scripts/profile-player.mjs www     # playback timing at 1920×1080 @2x
