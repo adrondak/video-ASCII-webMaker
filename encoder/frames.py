@@ -36,11 +36,15 @@ class _StderrTail(threading.Thread):
 
 
 def iter_rgb_frames(info: MediaInfo, fps: int, width: int, height: int,
-                    max_frames: int | None = None) -> Iterator[np.ndarray]:
-    """Yield ``(height, width, 3)`` uint8 RGB frames at a constant ``fps``."""
+                    max_frames: int | None = None, start: float = 0.0) -> Iterator[np.ndarray]:
+    """Yield ``(height, width, 3)`` uint8 RGB frames at a constant ``fps``.
+
+    ``start`` seeks (accurately) to that many seconds before decoding.
+    """
     ffmpeg, _ = require_tools()
     vf = f"fps={fps},scale={width}:{height}:flags=area,setsar=1,format=rgb24"
-    cmd = [ffmpeg, "-v", "error", "-nostdin", "-i", str(info.path),
+    seek = ["-ss", f"{start:.6f}"] if start > 0 else []
+    cmd = [ffmpeg, "-v", "error", "-nostdin", *seek, "-i", str(info.path),
            "-map", "0:v:0", "-an", "-sn", "-dn", "-vf", vf,
            "-f", "rawvideo", "-pix_fmt", "rgb24", "pipe:1"]
     frame_bytes = width * height * 3

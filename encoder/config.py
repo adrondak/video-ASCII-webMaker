@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass, field, fields
 from pathlib import Path
 from typing import Any
 
@@ -58,6 +58,7 @@ class EncodeConfig:
     stability: float = 0.25
     stabilization: bool = True
     cut_threshold: float = 0.22
+    scene_cuts: list[float] = field(default_factory=list)  # explicit boundaries, seconds
 
     # Container
     keyframe_interval: int = 48
@@ -111,6 +112,11 @@ STR_FIELDS = {"font", "glyphs", "title", "description", "foreground", "backgroun
 
 
 def _coerce(name: str, value: Any) -> Any:
+    if name == "scene_cuts":
+        if not isinstance(value, list) or any(
+                isinstance(v, bool) or not isinstance(v, (int, float)) or v < 0 for v in value):
+            raise ConfigError("scene_cuts: expected a list of non-negative seconds")
+        return sorted(float(v) for v in value)
     if value is None:
         if name == "line_height":
             return None

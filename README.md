@@ -3,11 +3,14 @@
 Turn a video into a moving image made of **real typographic characters**,
 encoded once on your machine and played back by a tiny static Canvas website.
 
-> **Checkpoint 01 — foundation.** This snapshot has the project skeleton,
-> pinned environment, bundled licensed font, FFmpeg probing, configuration
-> validation, synthetic fixtures and constant-frame-rate frame decoding.
-> Later checkpoints add the glyph engine, the ASCF container, packaging and the
-> web player. See `build.md` for the full specification.
+> **Checkpoint 02 — image engine.** On top of the foundation (probing,
+> config, fixtures, CFR decoding) this snapshot adds font calibration (glyphs
+> sorted by *measured* ink), grid sizing from the measured cell aspect,
+> linear-light luminance, tone curve with auto-levels, seeded glyph variation,
+> ordered dither, shape-aware detail weighting and temporal stabilisation.
+> `ascii-film preview` prints or rasterises a single frame. The binary
+> container, packaging and web player arrive in later checkpoints. See
+> `build.md` for the full specification.
 
 ## Setup (macOS)
 
@@ -23,5 +26,6 @@ pytest -q
 
 ```bash
 ascii-film probe tests/fixtures/landscape.mp4
-ascii-film encode tests/fixtures/landscape.mp4 --dry-run   # decode every frame
+ascii-film preview tests/fixtures/landscape.mp4 --time 1 --columns 100
+ascii-film preview your-clip.mp4 --time 5 --detail 1 --png frame.png
 ```
