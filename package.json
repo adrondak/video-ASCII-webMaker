@@ -4,6 +4,11 @@
   "type": "module",
   "description": "Dev-only tooling for the ASCII Film web player (the player itself has no dependencies).",
   "scripts": {
-    "test": "node --test tests/test_web.mjs"
+    "test": "node --test tests/test_web.mjs",
+    "e2e": "playwright test",
+    "e2e:install": "playwright install chromium firefox webkit"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
   }
 }

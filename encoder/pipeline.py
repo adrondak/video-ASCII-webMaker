@@ -166,5 +166,5 @@ def encode(cfg: EncodeConfig, source: str | Path, output: str | Path, force: boo
         f"{duration:.3f}s, {engine.stats.cuts} hard cut(s) detected")
     log(f"output:   {output}/ — animation {_human(stats.total_bytes)}, "
         f"total {_human(total)}, in {elapsed:.1f}s")
-    log(f"preview:  python3 -m http.server 8000 --directory {output}  ->  http://localhost:8000/")
+    log(f"preview:  scripts/serve.sh {output}  ->  http://localhost:8000/")
     return summary
