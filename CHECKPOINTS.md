@@ -23,7 +23,7 @@ git diff checkpoint-04-packaging checkpoint-05-player -- web/
 | `checkpoint-07-delivery` | The finished `www/` ocean site, full README, SiteGround guide, ASCF spec, technical report, zip packaging. | …just use the tool. |
 | `checkpoint-08-interaction` | Glyph physics: a cursor lens that parts and magnifies the glyphs, ripples from movement and clicks, underdamped springs that wag glyphs home; block-based repaint with pixel-exact restore; `--lens-*`/`--ripple-*` options. | …make the text-art interactive. |
 
-`main` always points at the latest checkpoint.
+`main` has the latest checkpoint plus small fixes, docs and CI made after it.
 
 ## Using a checkpoint
 

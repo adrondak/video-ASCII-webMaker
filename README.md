@@ -1,27 +1,51 @@
 # ASCII Film
 
-Turn a video into a moving image made of **real typographic characters**.
-Encode once on your own machine; publish a tiny static website that plays the
-character animation on a Canvas — no video file, no server code, no build step.
+[![tests](https://github.com/adrondak/video-ASCII-webMaker/actions/workflows/ci.yml/badge.svg)](https://github.com/adrondak/video-ASCII-webMaker/actions/workflows/ci.yml)
+[![live demo](https://img.shields.io/badge/live%20demo-open-2ea44f)](https://adrondak.github.io/video-ASCII-webMaker/)
+[![release](https://img.shields.io/github/v/release/adrondak/video-ASCII-webMaker?label=site%20zip)](https://github.com/adrondak/video-ASCII-webMaker/releases/latest)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+**Turn any video clip into a website where the picture is made of real text characters** —
+and the letters physically react when you move your mouse over them.
+
+### ▶ [Open the live demo](https://adrondak.github.io/video-ASCII-webMaker/)
+
+<p align="center"><img src="docs/demo.gif" alt="Waves drawn in text characters; a lens of magnified letters follows the cursor and the glyphs ripple and wag back into place" width="560"></p>
+
+Move your mouse over the waves: the letters part and magnify around the cursor,
+ripple as it moves, and wobble back into place when it leaves. Click for a
+shockwave. Press **T** to change colour (green phosphor, amber, ice), **I** to
+turn the physics off, **F** for fullscreen, **Space** to pause.
+
+---
+
+## Pick your path
+
+| You want to… | Do this |
+|---|---|
+| **Just look at it** | [Open the live demo](https://adrondak.github.io/video-ASCII-webMaker/). Nothing to install. |
+| **Put this exact site on your own website** | Download [`ascii-film-ocean-site.zip`](https://github.com/adrondak/video-ASCII-webMaker/releases/latest), upload it to your host and unzip. [SiteGround / cPanel guide](docs/SITEGROUND.md). |
+| **Make one from your own video** | [Quick start](#quick-start-macos): install FFmpeg + Python, run one command, upload the folder it makes. |
+| **Understand how it works** | [How it works](#how-it-works) below, the [file format spec](docs/ASCF.md), and the [measured results](docs/REPORT.md). |
+| **Learn by rebuilding it step by step** | The repo is tagged at every stage, from empty skeleton to finished site: [CHECKPOINTS.md](CHECKPOINTS.md). |
+| **Hack on it** | [Contributing](CONTRIBUTING.md) — tests run in CI on every push. |
+
+### What it is (and isn't)
+
+* **Real letters, not a video filter.** Every mark is a glyph from a monospace
+  font, drawn one by one on a canvas. No video file is shipped to visitors.
+* **Encode once, offline.** A Python tool reads your clip with FFmpeg and
+  writes a tiny animation file (2.8 MB for this 20-second, 220×74-glyph film).
+* **Plain static website.** HTML + JavaScript + one data file. Works on
+  SiteGround, GitHub Pages, Netlify, any web host — no server code, no build step,
+  no external requests, no tracking.
+* **Loops seamlessly** and starts silently on page load.
 
 ![The ocean film rendered in glyphs](docs/ocean-wave.png)
 
-<sub>Every mark above is a glyph from DejaVu Sans Mono Bold drawn on a canvas.
-100% crop:</sub>
+<sub>Close-up at 100% — every mark is a character:</sub>
 
 ![Detail of the glyph rendering at 100%](docs/ocean-detail.png)
-
-The finished demo is in [`www/`](www/): a self-contained, looping, silent site
-(2.9 MB) built from a 21-second 1080p ocean clip. Move the cursor over it and
-the glyphs physically react: they part and magnify around the cursor, ripple
-outward as it moves, and wag back into place when it leaves.
-
-![The glyph lens: characters part and swell around the cursor](docs/ocean-lens.png) Upload that folder to any
-static host — see [Hosting on SiteGround](docs/SITEGROUND.md).
-
-**Learning the technique?** The repository is tagged at every stage of the
-build, from an empty skeleton to the finished site. See
-[CHECKPOINTS.md](CHECKPOINTS.md) to clone any stage.
 
 ---
 
@@ -61,6 +85,9 @@ clip.mp4 ─ ffprobe ─ ffmpeg fps+scale ─ linear-light cells ─ tone curve
 
 ## Quick start (macOS)
 
+You need [FFmpeg](https://ffmpeg.org), Python 3.12+ and (only for running the
+tests) Node 18+. On a Mac with [Homebrew](https://brew.sh):
+
 ```bash
 brew install ffmpeg python@3.13 node
 git clone https://github.com/adrondak/video-ASCII-webMaker.git
@@ -83,8 +110,11 @@ Rebuild the demo site exactly as committed (put the source clip in
 ascii-film encode assets/video/1080ocean.mp4 --config examples/ocean-config.json --output www --force
 ```
 
-Linux works the same with your package manager's `ffmpeg`, Python ≥ 3.12 and
-Node ≥ 18 (Node is only needed for tests).
+Linux works the same with your package manager's `ffmpeg`. Windows: use WSL
+(Ubuntu) and follow the Linux route.
+
+Want the green look from the demo screenshots by default? Encode with
+`--foreground "#5dff8a" --background "#020b05"`.
 
 ## Commands
 
