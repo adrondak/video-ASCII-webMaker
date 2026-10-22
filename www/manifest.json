@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "title": "Ocean",
+  "description": "A green ocean wave curls and breaks into white foam beneath a pale sky, drawn entirely with moving text characters.",
+  "animation": "film.ascf",
+  "audio": null,
+  "audioOffsetSeconds": 0.0,
+  "durationSeconds": 20.375,
+  "fps": {
+    "numerator": 24,
+    "denominator": 1
+  },
+  "columns": 220,
+  "rows": 74,
+  "frameCount": 489,
+  "font": {
+    "family": "DejaVu Sans Mono",
+    "file": "font.woff2",
+    "license": "FONT-LICENSE.txt",
+    "size": 20.0,
+    "cellWidth": 12.04,
+    "cellHeight": 20.0,
+    "ascent": 0.929,
+    "descent": 0.236,
+    "lineHeight": 1.0
+  },
+  "theme": {
+    "foreground": "#e9f3f4",
+    "background": "#05090c"
+  },
+  "loop": true,
+  "autoplay": "muted",
+  "generator": "ascii-film 1.0.0",
+  "encoding": {
+    "glyphs": " _`.',-:~^\";!/*|><r+)(?c[]vlL%xzjt}{1fiYJnuCowIakXh$Zmpq#bdU80O&WQ@MB",
+    "levels": [
+      0.1406,
+      0.8809
+    ],
+    "brightness": -0.05,
+    "contrast": 1.05,
+    "gamma": 0.65,
+    "invert": false,
+    "detail": 0.4,
+    "dither": 0.0,
+    "variation": 1.0,
+    "seed": 1,
+    "stability": 0.3,
+    "keyframeInterval": 48,
+    "loopCrossfadeFrames": 24,
+    "sourceFrameRate": "24000/1001",
+    "resampledToFps": 24
+  }
+}

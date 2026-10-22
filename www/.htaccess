@@ -1,0 +1,32 @@
+# ASCII Film — settings for Apache-based shared hosting (SiteGround, cPanel, ...).
+# Everything here is optional: the site is plain static files and works without
+# this file. Each block is guarded so a missing module never causes a 500 error.
+
+DirectoryIndex index.html
+
+<IfModule mod_mime.c>
+  AddType application/octet-stream .ascf
+  AddType font/woff2 .woff2
+  AddType application/json .json
+  AddType text/javascript .js
+  AddType audio/mp4 .m4a
+  AddCharset utf-8 .html .js .css .json
+</IfModule>
+
+# Text assets compress well; film.ascf is already zlib-compressed per frame.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/json
+</IfModule>
+<IfModule mod_setenvif.c>
+  SetEnvIfNoCase Request_URI "\.(ascf|woff2|m4a)$" no-gzip dont-vary
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  <FilesMatch "\.(ascf|woff2|m4a)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+  <FilesMatch "\.(html|json|js|css)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
