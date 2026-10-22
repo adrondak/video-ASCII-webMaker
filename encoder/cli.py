@@ -8,14 +8,17 @@ from pathlib import Path
 
 from . import __version__
 from .config import build_config
+from .container import AscfFile, AscfWriter
 from .engine import FrameEngine
-from .errors import EncodeError
+from .errors import AscfError, EncodeError
 from .glyphs import render_grid_image
 from .mapping import grid_to_text
 from .probe import probe
 
 EPILOG = """examples:
   ascii-film probe clip.mp4
+  ascii-film encode clip.mp4 --output film.ascf --columns 160
+  ascii-film inspect film.ascf
   ascii-film preview clip.mp4 --time 3.5 --columns 120
 """
 
@@ -97,6 +100,46 @@ def cmd_preview(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_encode(args: argparse.Namespace) -> int:
+    """Checkpoint 03: write only the .ascf animation (packaging comes later)."""
+    cfg = _config(args)
+    info = probe(args.source)
+    engine = FrameEngine(cfg, info)
+    engine.measure_levels()
+    print(f"{info.describe()}\ngrid {engine.columns}x{engine.rows}", file=sys.stderr)
+    with AscfWriter(args.output, engine.columns, engine.rows, cfg.fps, 1,
+                    engine.glyphs.chars, args.keyframe_interval) as writer:
+        for grid in engine.grids():
+            writer.add_frame(grid)
+    s = writer.stats
+    print(f"wrote {args.output}: {s.frames} frames ({s.keyframes} key, {s.deltas} delta), "
+          f"{s.total_bytes} bytes", file=sys.stderr)
+    return 0
+
+
+def cmd_inspect(args: argparse.Namespace) -> int:
+    try:
+        f = AscfFile.open(args.file)
+        summary = f.validate_all()
+    except (AscfError, OSError) as exc:
+        print(f"INVALID: {exc}", file=sys.stderr)
+        return 1
+    h = f.header
+    sizes = f.index["clen"].astype(int)
+    print(f"file:            {args.file}")
+    print(f"format:          ASCF v{h.version[0]}.{h.version[1]}, {h.total_bytes} bytes")
+    print(f"grid:            {h.columns} x {h.rows} ({h.columns * h.rows} cells)")
+    print(f"frames:          {h.frame_count} at {h.fps_num}/{h.fps_den} fps "
+          f"= {h.duration_us / 1e6:.3f} s")
+    print(f"keyframes:       {summary['keyframes']} (interval {h.keyframe_interval}), "
+          f"deltas: {summary['deltas']}")
+    print(f"payload bytes:   min {sizes.min()}, mean {sizes.mean():.0f}, max {sizes.max()}")
+    print(f"glyphs ({len(f.glyphs):3d}):    {''.join(f.glyphs)!r}")
+    print(f"timestamps:      {'exact CFR, monotonic' if f.timestamps_exact() else 'monotonic'}")
+    print("integrity:       OK (structure + zlib Adler-32; ASCF v1 has no extra checksums)")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ascii-film",
@@ -115,6 +158,16 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--output", "-o", help="write the text to a file instead of stdout")
     p.add_argument("--png", help="also rasterise the frame with the font to this PNG")
     p.set_defaults(func=cmd_preview)
+
+    p = sub.add_parser("encode", help="encode a video into an .ascf animation")
+    _add_render_options(p)
+    p.add_argument("--output", "-o", required=True, help="output .ascf file")
+    p.add_argument("--keyframe-interval", type=int, default=48)
+    p.set_defaults(func=cmd_encode)
+
+    p = sub.add_parser("inspect", help="validate an .ascf file and print its structure")
+    p.add_argument("file")
+    p.set_defaults(func=cmd_inspect)
     return parser
 
 
