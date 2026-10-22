@@ -38,6 +38,7 @@ class EncodeConfig:
     line_height: float | None = None  # in em; None = font ascent + descent
     glyphs: str = DEFAULT_GLYPHS
     allow_proportional_font: bool = False
+    font_license: str = ""  # license file to ship; default: LICENSE* next to the font
 
     # Tone
     brightness: float = 0.0
@@ -69,8 +70,8 @@ class EncodeConfig:
     foreground: str = "#eeeeee"
     background: str = "#101010"
     loop: bool = True
-    autoplay: str = "off"  # "off" | "muted"
-    audio: bool = True
+    autoplay: str = "muted"  # "muted" (start silently, loop) | "off" (wait for a click)
+    audio: bool = False  # opt-in: package the source soundtrack as audio.m4a
     audio_bitrate: str = "160k"
 
     def to_dict(self) -> dict[str, Any]:
@@ -107,7 +108,7 @@ RANGES: dict[str, tuple[float, float]] = {
 INT_FIELDS = {"fps", "columns", "min_rows", "max_rows", "oversample_x", "oversample_y",
               "max_frames", "seed", "keyframe_interval"}
 BOOL_FIELDS = {"allow_proportional_font", "auto_levels", "invert", "stabilization", "loop", "audio"}
-STR_FIELDS = {"font", "glyphs", "title", "description", "foreground", "background",
+STR_FIELDS = {"font", "font_license", "glyphs", "title", "description", "foreground", "background",
               "autoplay", "audio_bitrate"}
 
 

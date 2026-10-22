@@ -1,0 +1,5 @@
+html, body { margin: 0; height: 100%; background: #101010; color: #eee; }
+#stage { position: fixed; inset: 0; display: grid; place-items: center; }
+canvas { display: block; }
+#status { position: absolute; font: 14px system-ui, sans-serif; opacity: .7; }
+#status:empty { display: none; }

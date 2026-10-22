@@ -1,0 +1,13 @@
+{
+  "_comment": "Defaults spelled out; any key can be overridden by a CLI flag.",
+  "fps": 24,
+  "columns": 160,
+  "glyphs": " .,:;irsXA253hMHGS#9B&@",
+  "contrast": 1.1,
+  "gamma": 1.0,
+  "stability": 0.25,
+  "keyframe_interval": 48,
+  "title": "ASCII Film demo",
+  "loop": true,
+  "autoplay": "muted"
+}

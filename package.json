@@ -1,0 +1,9 @@
+{
+  "name": "ascii-film-player",
+  "private": true,
+  "type": "module",
+  "description": "Dev-only tooling for the ASCII Film web player (the player itself has no dependencies).",
+  "scripts": {
+    "test": "node --test tests/test_web.mjs"
+  }
+}

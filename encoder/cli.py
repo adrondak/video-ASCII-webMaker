@@ -8,8 +8,9 @@ from pathlib import Path
 
 from . import __version__
 from .config import build_config
-from .container import AscfFile, AscfWriter
+from .container import AscfFile
 from .engine import FrameEngine
+from .pipeline import encode
 from .errors import AscfError, EncodeError
 from .glyphs import render_grid_image
 from .mapping import grid_to_text
@@ -17,7 +18,8 @@ from .probe import probe
 
 EPILOG = """examples:
   ascii-film probe clip.mp4
-  ascii-film encode clip.mp4 --output film.ascf --columns 160
+  ascii-film encode clip.mp4 --output dist/my-film --config examples/demo-config.json
+  ascii-film encode clip.mp4 -o www --columns 200 --title "Ocean" --force
   ascii-film inspect film.ascf
   ascii-film preview clip.mp4 --time 3.5 --columns 120
 """
@@ -58,7 +60,8 @@ def _add_render_options(p: argparse.ArgumentParser) -> None:
 OPTION_NAMES = ["fps", "columns", "font", "font_size", "line_height", "allow_proportional_font",
                 "glyphs", "brightness", "contrast", "gamma", "auto_levels", "invert", "detail",
                 "dither", "variation", "seed", "foreground", "background", "stability",
-                "stabilization", "cut_threshold", "scene_cuts"]
+                "stabilization", "cut_threshold", "scene_cuts", "title", "description",
+                "keyframe_interval", "audio", "autoplay", "loop", "font_license", "max_frames"]
 
 
 def _overrides(args: argparse.Namespace) -> dict:
@@ -101,19 +104,9 @@ def cmd_preview(args: argparse.Namespace) -> int:
 
 
 def cmd_encode(args: argparse.Namespace) -> int:
-    """Checkpoint 03: write only the .ascf animation (packaging comes later)."""
     cfg = _config(args)
-    info = probe(args.source)
-    engine = FrameEngine(cfg, info)
-    engine.measure_levels()
-    print(f"{info.describe()}\ngrid {engine.columns}x{engine.rows}", file=sys.stderr)
-    with AscfWriter(args.output, engine.columns, engine.rows, cfg.fps, 1,
-                    engine.glyphs.chars, args.keyframe_interval) as writer:
-        for grid in engine.grids():
-            writer.add_frame(grid)
-    s = writer.stats
-    print(f"wrote {args.output}: {s.frames} frames ({s.keyframes} key, {s.deltas} delta), "
-          f"{s.total_bytes} bytes", file=sys.stderr)
+    encode(cfg, args.source, args.output, force=args.force,
+           log=lambda msg: print(msg, file=sys.stderr))
     return 0
 
 
@@ -159,10 +152,23 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--png", help="also rasterise the frame with the font to this PNG")
     p.set_defaults(func=cmd_preview)
 
-    p = sub.add_parser("encode", help="encode a video into an .ascf animation")
+    p = sub.add_parser("encode", help="encode a video into a static publish directory",
+                       epilog=EPILOG, formatter_class=argparse.RawDescriptionHelpFormatter)
     _add_render_options(p)
-    p.add_argument("--output", "-o", required=True, help="output .ascf file")
-    p.add_argument("--keyframe-interval", type=int, default=48)
+    p.add_argument("--output", "-o", required=True, help="publish directory to create")
+    p.add_argument("--force", action="store_true", help="replace an existing output directory")
+    g = p.add_argument_group("package")
+    g.add_argument("--title", help="film title (shown in the browser tab)")
+    g.add_argument("--description", help="alt text describing the film for screen readers")
+    g.add_argument("--keyframe-interval", type=int, help="max frames between keyframes (default 48)")
+    g.add_argument("--audio", dest="audio", action="store_true", default=None,
+                   help="include the source soundtrack as AAC audio.m4a (off by default)")
+    g.add_argument("--no-audio", dest="audio", action="store_false")
+    g.add_argument("--autoplay", choices=["muted", "off"],
+                   help="'muted' starts playing on load (default); 'off' waits for a click")
+    g.add_argument("--no-loop", dest="loop", action="store_false", default=None)
+    g.add_argument("--font-license", help="license file to ship with the font")
+    g.add_argument("--max-frames", type=int, help="stop after this many frames")
     p.set_defaults(func=cmd_encode)
 
     p = sub.add_parser("inspect", help="validate an .ascf file and print its structure")
