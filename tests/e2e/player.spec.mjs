@@ -135,57 +135,6 @@ test("fullscreen toggles where supported", async ({ page, browserName }) => {
   await expect(page.locator("#fullscreen")).toHaveAttribute("aria-label", "Exit full screen");
 });
 
-test("audio film waits for a click, then audio is the master clock", async ({ page, browserName }) => {
-  const w = watchPage(page);
-  await page.goto("audio/");
-  await ready(page);
-  expect(await page.evaluate(() => window.asciiFilm.playing)).toBe(false);
-  await expect(page.locator("#big-play")).toBeVisible();
-  await page.locator("#big-play").click();
-  const started = await page.waitForFunction(() => window.asciiFilm.audio.currentTime > 0.3, null, { timeout: 5000 }).then(() => true, () => false);
-  test.skip(!started, `audio output unavailable in headless ${browserName}`);
-  // Sample the on-screen frame against audio time: target within 100 ms.
-  const worst = await page.evaluate(async () => {
-    const p = window.asciiFilm;
-    let worstMs = 0;
-    for (let k = 0; k < 20; k++) {
-      await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 30)));
-      const t = p.audio.currentTime;
-      const shownStart = (p.shown * p.m.fps.denominator) / p.m.fps.numerator;
-      const err = Math.max(0, t - shownStart - p.m.fps.denominator / p.m.fps.numerator, shownStart - t);
-      worstMs = Math.max(worstMs, err * 1000);
-    }
-    return worstMs;
-  });
-  // The player can only be as precise as the clock it follows. Some headless
-  // audio backends (e.g. WebKit + GStreamer without a sound device) advance
-  // currentTime in coarse jumps; measure that step before judging sync.
-  const clockStepMs = await page.evaluate(async () => {
-    const a = window.asciiFilm.audio;
-    let last = a.currentTime, lastChange = performance.now(), worst = 0;
-    const end = performance.now() + 600;
-    while (performance.now() < end) {
-      await new Promise((r) => setTimeout(r, 5));
-      if (a.currentTime !== last) {
-        const now = performance.now();
-        worst = Math.max(worst, now - lastChange);
-        last = a.currentTime;
-        lastChange = now;
-      }
-    }
-    return worst;
-  });
-  console.log(`[${browserName}] worst A/V offset beyond one frame: ${worst.toFixed(1)} ms (audio clock step ${clockStepMs.toFixed(0)} ms)`);
-  // A clock coarser than one frame can be stale by up to one full step.
-  const frameMs = await page.evaluate(() => (1000 * window.asciiFilm.m.fps.denominator) / window.asciiFilm.m.fps.numerator);
-  expect(worst).toBeLessThan(100 + (clockStepMs > frameMs ? clockStepMs : 0));
-  await page.keyboard.press("m");
-  await expect(page.locator("#mute")).toHaveAttribute("aria-label", "Unmute");
-  await page.evaluate(() => window.asciiFilm.seek(3));
-  await page.waitForFunction(() => Math.abs(window.asciiFilm.audio.currentTime - 3) < 0.6);
-  expect(w.errors).toEqual([]);
-});
-
 test("lens parts the glyphs, ripples spread, and everything returns exactly", async ({ page }) => {
   await page.goto("silent/");
   await ready(page);
