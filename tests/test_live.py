@@ -10,6 +10,8 @@ def test_live_site_is_separate_and_complete(tmp_path):
     assert {"index.html", "live.js", "camera.js", "renderer.js", "field.js", "pointer.js",
             "player.css", "live.json", "font.woff2", "FONT-LICENSE.txt", ".htaccess"} <= files
     assert "film.ascf" not in files and "manifest.json" not in files
+    htaccess = (out / ".htaccess").read_text()
+    assert "RewriteRule ^ https://" in htaccess and "camera=(self)" in htaccess
     m = json.loads((out / "live.json").read_text())
     assert m["kind"] == "live" and m["title"] == "Mirror" and m["columns"] == 120
     assert m["glyphs"][0] == " " and m["coverage"][0] == 0

@@ -27,7 +27,7 @@ LIVE_FILES = {
     "field.js": "field.js",
     "pointer.js": "pointer.js",
     "player.css": "player.css",
-    ".htaccess": ".htaccess",
+    "live.htaccess": ".htaccess",
 }
 LIVE_COLUMN_STEPS = [80, 100, 120, 140, 160, 190, 220]
 

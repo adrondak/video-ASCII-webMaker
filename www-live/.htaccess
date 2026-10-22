@@ -30,3 +30,21 @@ DirectoryIndex index.html
     Header set Cache-Control "no-cache"
   </FilesMatch>
 </IfModule>
+
+# --- Live webcam page only -------------------------------------------------
+# Browsers only allow the camera on https:// pages, so send http visitors to
+# the https address. Turn on the free Let's Encrypt certificate first
+# (SiteGround: Site Tools -> Security -> SSL Manager). The X-Forwarded-Proto
+# check stops a redirect loop behind SiteGround's proxy. 302, not 301, so a
+# mistake is never cached by browsers.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=302,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Camera for this site only; no microphone, no geolocation.
+  Header set Permissions-Policy "camera=(self), microphone=(), geolocation=()"
+</IfModule>

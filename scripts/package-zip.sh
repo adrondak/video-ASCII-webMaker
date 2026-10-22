@@ -6,7 +6,7 @@
 set -euo pipefail
 dir="${1:-www}"
 out="${2:-dist/$(basename "$dir")-site.zip}"
-[ -f "$dir/index.html" ] && [ -f "$dir/manifest.json" ] || { echo "$dir is not a publish directory" >&2; exit 1; }
+[ -f "$dir/index.html" ] && { [ -f "$dir/manifest.json" ] || [ -f "$dir/live.json" ]; } || { echo "$dir is not a publish directory" >&2; exit 1; }
 mkdir -p "$(dirname "$out")"
 out_abs="$(cd "$(dirname "$out")" && pwd)/$(basename "$out")"
 rm -f "$out_abs"

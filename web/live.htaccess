@@ -1,0 +1,50 @@
+# ASCII Film — settings for Apache-based shared hosting (SiteGround, cPanel, ...).
+# Everything here is optional: the site is plain static files and works without
+# this file. Each block is guarded so a missing module never causes a 500 error.
+
+DirectoryIndex index.html
+
+<IfModule mod_mime.c>
+  AddType application/octet-stream .ascf
+  AddType font/woff2 .woff2
+  AddType application/json .json
+  AddType text/javascript .js
+  AddType audio/mp4 .m4a
+  AddCharset utf-8 .html .js .css .json
+</IfModule>
+
+# Text assets compress well; film.ascf is already zlib-compressed per frame.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/json
+</IfModule>
+<IfModule mod_setenvif.c>
+  SetEnvIfNoCase Request_URI "\.(ascf|woff2|m4a)$" no-gzip dont-vary
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  <FilesMatch "\.(ascf|woff2|m4a)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+  <FilesMatch "\.(html|json|js|css)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
+# --- Live webcam page only -------------------------------------------------
+# Browsers only allow the camera on https:// pages, so send http visitors to
+# the https address. Turn on the free Let's Encrypt certificate first
+# (SiteGround: Site Tools -> Security -> SSL Manager). The X-Forwarded-Proto
+# check stops a redirect loop behind SiteGround's proxy. 302, not 301, so a
+# mistake is never cached by browsers.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=302,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Camera for this site only; no microphone, no geolocation.
+  Header set Permissions-Policy "camera=(self), microphone=(), geolocation=()"
+</IfModule>

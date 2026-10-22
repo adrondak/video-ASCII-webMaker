@@ -74,7 +74,14 @@ scripts/serve.sh www-live        # open http://localhost:8000/ and click "Start 
   **F** fullscreen. Move the cursor to push your own face around.
 * **Hosting:** upload `www-live/` like any static site. Browsers only allow
   cameras on `https://` pages (or `localhost`); SiteGround's free Let's Encrypt
-  certificate and GitHub Pages both qualify.
+  certificate and GitHub Pages both qualify. The live `.htaccess` sends `http://`
+  visitors to `https://` and allows the camera for this site only.
+* **SiteGround in four steps:**
+  1. `scripts/package-zip.sh www-live dist/ascii-mirror-site.zip` (about 160 KB).
+  2. Site Tools → Security → SSL Manager: make sure the domain has a certificate.
+  3. Site Tools → File Manager → `public_html/` → create a folder, e.g. `mirror`,
+     upload the zip into it and **Extract**.
+  4. Open `https://your-domain/mirror/` and click **Start camera**.
 * **Speed:** mapping a 140×47 frame takes about 5 ms in Chromium. The
   page runs at the camera's own frame rate.
 
