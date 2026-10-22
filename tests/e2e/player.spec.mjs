@@ -176,7 +176,9 @@ test("audio film waits for a click, then audio is the master clock", async ({ pa
     return worst;
   });
   console.log(`[${browserName}] worst A/V offset beyond one frame: ${worst.toFixed(1)} ms (audio clock step ${clockStepMs.toFixed(0)} ms)`);
-  expect(worst).toBeLessThan(100 + Math.max(0, clockStepMs - 50));
+  // A clock coarser than one frame can be stale by up to one full step.
+  const frameMs = await page.evaluate(() => (1000 * window.asciiFilm.m.fps.denominator) / window.asciiFilm.m.fps.numerator);
+  expect(worst).toBeLessThan(100 + (clockStepMs > frameMs ? clockStepMs : 0));
   await page.keyboard.press("m");
   await expect(page.locator("#mute")).toHaveAttribute("aria-label", "Unmute");
   await page.evaluate(() => window.asciiFilm.seek(3));
