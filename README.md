@@ -27,6 +27,7 @@ turn the physics off, **F** for fullscreen, **Space** to pause.
 | **Put this exact site on your own website** | Download [`ascii-film-ocean-site.zip`](https://github.com/adrondak/video-ASCII-webMaker/releases/latest), upload it to your host and unzip. [SiteGround / cPanel guide](docs/SITEGROUND.md). |
 | **Make one from your own video** | [Quick start](#quick-start-macos): install FFmpeg + Python, run one command, upload the folder it makes. |
 | **Understand how it works** | [How it works](#how-it-works) below, the [file format spec](docs/ASCF.md), and the [measured results](docs/REPORT.md). |
+| **See yourself in glyphs, live from a webcam** | Switch to the [`webcam` branch](https://github.com/adrondak/video-ASCII-webMaker/tree/webcam#live-webcam-mode--ascii-mirror-webcam-branch) (*ASCII Mirror*): a separate static site that draws your camera live in text, with the same lens and ripples. Nothing leaves the browser. |
 | **Learn by rebuilding it step by step** | The repo is tagged at every stage, from empty skeleton to finished site: [CHECKPOINTS.md](CHECKPOINTS.md). |
 | **Hack on it** | [Contributing](CONTRIBUTING.md) — tests run in CI on every push. |
 

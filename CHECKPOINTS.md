@@ -1,6 +1,6 @@
 # Checkpoints
 
-This repository was built in seven phases plus one extension, and each phase is an annotated git
+This repository was built in seven phases plus two extensions, and each phase is an annotated git
 tag you can clone on its own. Every checkpoint is a working project at that
 stage — its README says what it can do and its tests pass.
 
@@ -23,7 +23,11 @@ git diff checkpoint-04-packaging checkpoint-05-player -- web/
 | `checkpoint-07-delivery` | The finished `www/` ocean site, full README, SiteGround guide, ASCF spec, technical report, zip packaging. | …just use the tool. |
 | `checkpoint-08-interaction` | Glyph physics: a cursor lens that parts and magnifies the glyphs, ripples from movement and clicks, underdamped springs that wag glyphs home; block-based repaint with pixel-exact restore; `--lens-*`/`--ripple-*` options. | …make the text-art interactive. |
 
-`main` has the latest checkpoint plus small fixes, docs and CI made after it.
+| `checkpoint-09-webcam` | *On the [`webcam` branch](https://github.com/adrondak/video-ASCII-webMaker/tree/webcam).* ASCII Mirror: `ascii-film live` builds a separate static site that maps webcam frames to glyphs in the browser (JS port of the mapping and stabiliser, smoothed live auto-levels), with the lens and ripples; fake-camera E2E tests. | …turn a live camera into text art. |
+
+`main` has the latest checkpoint up to 08 plus small fixes, docs and CI made after it.
+The webcam mode lives only on the `webcam` branch, so the ocean site on `main` stays a
+plain film.
 
 ## Using a checkpoint
 
